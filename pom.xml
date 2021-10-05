@@ -27,7 +27,12 @@
             <artifactId>dagger</artifactId>
             <version>2.35.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger-compiler</artifactId>
+            <version>2.35.1</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <artifactId>mesh-rest-client</artifactId>
             <groupId>com.gentics.mesh</groupId>
@@ -40,6 +45,11 @@
             <version>4.0.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars</artifactId>
+            <version>4.2.1.</version>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -55,5 +65,24 @@
             </snapshots>
         </repository>
     </repositories>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.dagger</groupId>
+                            <artifactId>dagger-compiler</artifactId>
+                            <version>2.35.1</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
