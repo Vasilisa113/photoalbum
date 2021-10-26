@@ -13,7 +13,4 @@ public interface StoragesModule {
     Database bindDatabase(MeshStorage arg);
     @Binds
     TemplateStorage bindTemplateStorage(MeshStorage arg1);
-    @Provides static MeshStorage provideMeshStorage(){
-        return new MeshStorage();
-    }
 }
