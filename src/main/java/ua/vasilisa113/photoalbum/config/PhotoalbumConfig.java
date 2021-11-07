@@ -9,5 +9,15 @@ public class PhotoalbumConfig {
         this.meshStorage = meshStorage;
     }
 
-    private MeshStorageConfig meshStorage;
+    private MeshStorageConfig meshStorage = new MeshStorageConfig();
+
+    public VertxConfig getVertx() {
+        return vertx;
+    }
+
+    public void setVertx(VertxConfig vertx) {
+        this.vertx = vertx;
+    }
+
+    private VertxConfig vertx = new VertxConfig();
 }

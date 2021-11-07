@@ -12,6 +12,7 @@ public class Main {
     public static void main(String[] args) {
         PhotoalbumComponent photoalbumComponent = DaggerPhotoalbumComponent.builder().build();
         Photoalbum photoalbum = photoalbumComponent.photoalbum();
+        photoalbum.start();
         //Vertx vertx = Vertx.vertx();
         //vertx.deployVerticle(new CheckingVerticle());
     }
