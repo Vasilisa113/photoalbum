@@ -61,4 +61,14 @@ public class MeshStorageConfig {
 
     private String password;
 
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    private String projectName = "Lana";
+
 }
