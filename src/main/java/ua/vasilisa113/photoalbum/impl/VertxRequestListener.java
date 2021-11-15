@@ -8,6 +8,7 @@ import ua.vasilisa113.photoalbum.RequestHandler;
 import ua.vasilisa113.photoalbum.RequestListener;
 
 import javax.inject.Inject;
+import java.net.HttpURLConnection;
 
 public class VertxRequestListener extends AbstractVerticle implements RequestListener {
     private final RequestHandler requestHandler;
@@ -20,7 +21,13 @@ public class VertxRequestListener extends AbstractVerticle implements RequestLis
         router = arg2;
         vertx.deployVerticle(this);
         router.route("/").handler(context ->{
-            context.json(new JsonObject().put("Hello", "World"));
+       //     context.json(new JsonObject().put("Hello", "World"));
+            try {
+                requestHandler.handlePortfolio(context);
+            }
+            catch (Throwable e){
+                context.response().setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR).end("Error!!!!!!!!!!!");
+            }
         });
     }
 }
