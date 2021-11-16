@@ -79,6 +79,6 @@ public class MeshStorageConfig {
         this.initialSchemaName = initialSchemaName;
     }
 
-    private String initialSchemaName = "folder";
+    private String initialSchemaName = "photoalbumFolder";
 
 }

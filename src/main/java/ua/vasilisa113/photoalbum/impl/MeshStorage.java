@@ -2,14 +2,8 @@ package ua.vasilisa113.photoalbum.impl;
 
 import com.gentics.mesh.core.rest.project.ProjectCreateRequest;
 import com.gentics.mesh.core.rest.project.ProjectResponse;
-import com.gentics.mesh.core.rest.schema.BinaryFieldSchema;
-import com.gentics.mesh.core.rest.schema.FieldSchema;
-import com.gentics.mesh.core.rest.schema.SchemaListResponse;
-import com.gentics.mesh.core.rest.schema.StringFieldSchema;
-import com.gentics.mesh.core.rest.schema.impl.BinaryFieldSchemaImpl;
-import com.gentics.mesh.core.rest.schema.impl.SchemaCreateRequest;
-import com.gentics.mesh.core.rest.schema.impl.SchemaResponse;
-import com.gentics.mesh.core.rest.schema.impl.StringFieldSchemaImpl;
+import com.gentics.mesh.core.rest.schema.*;
+import com.gentics.mesh.core.rest.schema.impl.*;
 import com.gentics.mesh.rest.client.MeshRestClient;
 import com.gentics.mesh.rest.client.MeshRestClientConfig;
 import com.gentics.mesh.rest.client.MeshRestClientMessageException;
@@ -36,26 +30,24 @@ public class MeshStorage implements TemplateStorage, Database {
         //GenericMessageResponse response = client.login().blockingGet();
         //UserResponse response = client.me().blockingGet();
         //System.out.println(response.toString());
-        ProjectResponse project = null;
-        try {
-            project = client.findProjectByName(config.getMeshStorage().getProjectName()).blockingGet();
-        } catch (Throwable e) {
-            if (e.getCause() instanceof MeshRestClientMessageException) {
-                MeshRestClientMessageException me = (MeshRestClientMessageException) e.getCause();
-                if (HttpURLConnection.HTTP_NOT_FOUND == me.getStatusCode()) {
-                    ProjectCreateRequest request = new ProjectCreateRequest();
-                    request.setName(config.getMeshStorage().getProjectName());
-                    request.setSchemaRef(config.getMeshStorage().getInitialSchemaName());
-                    project = client.createProject(request).blockingGet();
-                } else {
-                    throw new RuntimeException("Error finding project name", e.getCause());
-                }
-            } else {
-                throw new RuntimeException("Error requesting project name", e);
-            }
-        }
         SchemaListResponse schemasResponse = client.findSchemas().blockingGet();
-        if (schemasResponse.getData().stream().noneMatch(schema -> schema.getName().equals("portfolio"))) {
+        SchemaResponse photoalbumFolderResponse = schemasResponse.getData().stream().filter(schema -> schema.getName().equals("photoalbumFolder")).findAny().orElse(null);
+        if (photoalbumFolderResponse == null) {
+            SchemaCreateRequest photoalbumFolderSchemaCreateRequest = new SchemaCreateRequest();
+            photoalbumFolderSchemaCreateRequest.setName(config.getMeshStorage().getInitialSchemaName());
+            photoalbumFolderSchemaCreateRequest.setDescription("photoalbumFolder");
+            photoalbumFolderSchemaCreateRequest.setContainer(true);
+            List<FieldSchema> photoalbumFolderFields = new ArrayList<>();
+            NodeFieldSchema defaultPageField = new NodeFieldSchemaImpl();
+            defaultPageField.setName("defaultPage");
+            defaultPageField.setLabel("Default page of Folder");
+            photoalbumFolderFields.add(defaultPageField);
+
+            photoalbumFolderSchemaCreateRequest.setFields(photoalbumFolderFields);
+            photoalbumFolderResponse = client.createSchema(photoalbumFolderSchemaCreateRequest).blockingGet();
+        }
+        SchemaResponse portfolioResponse = schemasResponse.getData().stream().filter(schema -> schema.getName().equals("portfolio")).findAny().orElse(null);
+        if (portfolioResponse == null) {
             SchemaCreateRequest portfolioSchemaCreateRequest = new SchemaCreateRequest();
             portfolioSchemaCreateRequest.setName("portfolio");
             portfolioSchemaCreateRequest.setDescription("Portfolio Page");
@@ -80,8 +72,27 @@ public class MeshStorage implements TemplateStorage, Database {
             portfolioFields.add(descriptionField);
 
             portfolioSchemaCreateRequest.setFields(portfolioFields);
-            SchemaResponse portfolioResponse = client.createSchema(portfolioSchemaCreateRequest).blockingGet();
-            portfolioResponse = client.assignSchemaToProject(project.getName(),portfolioResponse.getUuid()).blockingGet();
+            portfolioResponse = client.createSchema(portfolioSchemaCreateRequest).blockingGet();
+        }
+        ProjectResponse project = null;
+        try {
+            project = client.findProjectByName(config.getMeshStorage().getProjectName()).blockingGet();
+        } catch (Throwable e) {
+            if (e.getCause() instanceof MeshRestClientMessageException) {
+                MeshRestClientMessageException me = (MeshRestClientMessageException) e.getCause();
+                if (HttpURLConnection.HTTP_NOT_FOUND == me.getStatusCode()) {
+                    ProjectCreateRequest request = new ProjectCreateRequest();
+                    request.setName(config.getMeshStorage().getProjectName());
+                    request.setSchemaRef(config.getMeshStorage().getInitialSchemaName());
+                    project = client.createProject(request).blockingGet();
+                    photoalbumFolderResponse = client.assignSchemaToProject(project.getName(),photoalbumFolderResponse.getUuid()).blockingGet();
+                    portfolioResponse = client.assignSchemaToProject(project.getName(),portfolioResponse.getUuid()).blockingGet();
+                } else {
+                    throw new RuntimeException("Error finding project name", e.getCause());
+                }
+            } else {
+                throw new RuntimeException("Error requesting project name", e);
+            }
         }
     }
 }
