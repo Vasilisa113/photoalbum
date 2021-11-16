@@ -71,4 +71,14 @@ public class MeshStorageConfig {
 
     private String projectName = "Lana";
 
+    public String getInitialSchemaName() {
+        return initialSchemaName;
+    }
+
+    public void setInitialSchemaName(String initialSchemaName) {
+        this.initialSchemaName = initialSchemaName;
+    }
+
+    private String initialSchemaName = "folder";
+
 }
