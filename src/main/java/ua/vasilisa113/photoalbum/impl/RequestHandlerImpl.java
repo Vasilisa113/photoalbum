@@ -6,6 +6,7 @@ import ua.vasilisa113.photoalbum.RequestHandler;
 import ua.vasilisa113.photoalbum.TemplateHandler;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 
 public class RequestHandlerImpl implements RequestHandler {
@@ -19,8 +20,11 @@ public class RequestHandlerImpl implements RequestHandler {
     }
 
     @Override
-    public void handlePortfolio(RoutingContext context) {
-        context.response().setStatusCode(HttpURLConnection.HTTP_OK).end("Portfolio");
+    public void handlePortfolio(RoutingContext context) throws IOException {
+        context.response()
+                .setStatusCode(HttpURLConnection.HTTP_OK)
+                .putHeader("Content-Type", "text/html; charset=utf-8")
+                .end(templateHandler.createPortfolio());
     }
 
     @Override
