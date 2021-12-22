@@ -10,4 +10,6 @@ public interface RequestHandler {
     public void handlePrice(RoutingContext context);
     public void handleBlog(RoutingContext context);
     public void handleContacts(RoutingContext context);
+
+    public void handleStaticResource(RoutingContext context);
 }

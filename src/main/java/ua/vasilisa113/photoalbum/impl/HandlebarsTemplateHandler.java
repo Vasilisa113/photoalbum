@@ -8,6 +8,7 @@ import ua.vasilisa113.photoalbum.config.PhotoalbumConfig;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +21,12 @@ public class HandlebarsTemplateHandler implements TemplateHandler {
         this.config = config;
         templateStorage = arg;
         handlebars = new Handlebars();
+    }
+
+    @Override
+    public InputStream getStaticResource(String path, String language) {
+        int pathStart = path.indexOf("/");
+        return templateStorage.getStaticResource(path.substring(0, pathStart), path.substring(pathStart+1), language);
     }
 
     @Override

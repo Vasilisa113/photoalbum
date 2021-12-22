@@ -4,18 +4,16 @@ import com.gentics.mesh.core.rest.node.FieldMap;
 import com.gentics.mesh.core.rest.node.FieldMapImpl;
 import com.gentics.mesh.core.rest.node.NodeCreateRequest;
 import com.gentics.mesh.core.rest.node.NodeResponse;
-import com.gentics.mesh.core.rest.node.field.BinaryField;
 import com.gentics.mesh.core.rest.node.field.NodeField;
 import com.gentics.mesh.core.rest.node.field.StringField;
-import com.gentics.mesh.core.rest.node.field.impl.StringFieldImpl;
 import com.gentics.mesh.core.rest.project.ProjectCreateRequest;
 import com.gentics.mesh.core.rest.project.ProjectResponse;
 import com.gentics.mesh.core.rest.schema.*;
 import com.gentics.mesh.core.rest.schema.impl.*;
-import com.gentics.mesh.rest.client.MeshBinaryResponse;
 import com.gentics.mesh.rest.client.MeshRestClient;
 import com.gentics.mesh.rest.client.MeshRestClientConfig;
 import com.gentics.mesh.rest.client.MeshRestClientMessageException;
+import com.gentics.mesh.rest.client.MeshWebrootResponse;
 import com.gentics.mesh.rest.client.impl.MeshRestOkHttpClientImpl;
 import ua.vasilisa113.photoalbum.Database;
 import ua.vasilisa113.photoalbum.TemplateStorage;
@@ -30,7 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MeshStorage implements TemplateStorage, Database {
 
@@ -187,5 +184,11 @@ public class MeshStorage implements TemplateStorage, Database {
                 .lines()
                 .collect(Collectors.joining(""));
 
+    }
+
+    @Override
+    public InputStream getStaticResource(String projectName, String resourceName, String language) {
+        MeshWebrootResponse resourceNode = client.webroot(projectName, "/" + resourceName).blockingGet();
+        return client.downloadBinaryField(projectName, resourceNode.getNodeUuid(), language, CONTENT).blockingGet().getStream();
     }
 }

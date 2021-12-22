@@ -7,6 +7,7 @@ import ua.vasilisa113.photoalbum.TemplateHandler;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 
 public class RequestHandlerImpl implements RequestHandler {
@@ -45,5 +46,15 @@ public class RequestHandlerImpl implements RequestHandler {
     @Override
     public void handleContacts(RoutingContext context) {
         throw new IllegalStateException("not implemented");
+    }
+
+    @Override
+    public void handleStaticResource(RoutingContext context) {
+        InputStream resource = templateHandler.getStaticResource(context.pathParam("*"), context.queryParams().get("lang"));
+        context.response().send(new AsyncInputStream(context.vertx(), context.vertx().getOrCreateContext(), resource), result -> {
+            if (result.failed()) {
+                context.fail(result.cause());
+            }
+        });
     }
 }
