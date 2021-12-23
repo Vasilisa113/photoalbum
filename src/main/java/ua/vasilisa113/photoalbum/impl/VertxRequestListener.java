@@ -20,14 +20,7 @@ public class VertxRequestListener extends AbstractVerticle implements RequestLis
         vertx = arg1;
         router = arg2;
         vertx.deployVerticle(this);
-        router.route("/").handler(context ->{
-            try {
-                requestHandler.handlePortfolio(context);
-            }
-            catch (Throwable e){
-                context.response().setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR).end("Error!!!!!!!!!!!");
-            }
-        });
+        router.route("/").handler(requestHandler::handlePortfolio);
         router.route("/static/*").handler(context ->{
             try {
                 requestHandler.handleStaticResource(context);

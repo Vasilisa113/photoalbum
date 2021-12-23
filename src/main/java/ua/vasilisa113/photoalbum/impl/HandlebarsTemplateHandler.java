@@ -32,7 +32,7 @@ public class HandlebarsTemplateHandler implements TemplateHandler {
     }
 
     @Override
-    public Single<String> createPortfolio() throws IOException {
+    public Single<String> createPortfolio() {
         return templateStorage.getTemplate(config.getMeshStorage().getProjectName(), "portfolioTemplate", "en")
                 .flatMap(template -> {
                     Template portfolioTemplate = handlebars.compileInline(template);

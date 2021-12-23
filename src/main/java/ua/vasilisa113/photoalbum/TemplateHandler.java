@@ -8,5 +8,5 @@ import java.io.InputStream;
 
 public interface TemplateHandler {
     InputStream getStaticResource (String path, String language);
-    Single<String> createPortfolio() throws IOException;
+    Single<String> createPortfolio();
 }
