@@ -22,10 +22,11 @@ public class RequestHandlerImpl implements RequestHandler {
 
     @Override
     public void handlePortfolio(RoutingContext context) throws IOException {
-        context.response()
+        templateHandler.createPortfolio().subscribe(portfolio -> context.response()
                 .setStatusCode(HttpURLConnection.HTTP_OK)
                 .putHeader("Content-Type", "text/html; charset=utf-8")
-                .end(templateHandler.createPortfolio());
+                .end(portfolio)
+        );
     }
 
     @Override

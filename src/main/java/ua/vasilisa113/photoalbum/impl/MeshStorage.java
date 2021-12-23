@@ -15,6 +15,7 @@ import com.gentics.mesh.rest.client.MeshRestClientConfig;
 import com.gentics.mesh.rest.client.MeshRestClientMessageException;
 import com.gentics.mesh.rest.client.MeshWebrootResponse;
 import com.gentics.mesh.rest.client.impl.MeshRestOkHttpClientImpl;
+import io.reactivex.Single;
 import ua.vasilisa113.photoalbum.Database;
 import ua.vasilisa113.photoalbum.TemplateStorage;
 import ua.vasilisa113.photoalbum.config.PhotoalbumConfig;
@@ -174,16 +175,16 @@ public class MeshStorage implements TemplateStorage, Database {
     }
 
     @Override
-    public String getTemplate(String projectName, String templateName, String language) {
-        NodeField photoalbumDataField = client.webroot(projectName, "/" + PHOTOALBUM_DATA).blockingGet()
-                .getNodeResponse().getFields().getNodeField(templateName);
-        NodeResponse photoalbumData = client.findNodeByUuid(projectName, photoalbumDataField.getUuid()).blockingGet();
-        InputStream inputStream = client.downloadBinaryField(projectName, photoalbumData.getUuid(), language, CONTENT).blockingGet().getStream();
-        return new BufferedReader(
-                new InputStreamReader(inputStream, StandardCharsets.UTF_8))
-                .lines()
-                .collect(Collectors.joining(""));
-
+    public Single<String> getTemplate(String projectName, String templateName, String language) {
+        return client.webroot(projectName, "/" + PHOTOALBUM_DATA).toSingle()
+                .flatMap(
+                        response -> client.findNodeByUuid(projectName, response.getNodeResponse().getFields().getNodeField(templateName).getUuid()).toSingle()
+                ).flatMap(
+                        response -> client.downloadBinaryField(projectName, response.getUuid(), language, CONTENT).toSingle()
+                ).flatMap(response -> Single.just(new BufferedReader(
+                        new InputStreamReader(response.getStream(), StandardCharsets.UTF_8))
+                        .lines()
+                        .collect(Collectors.joining(""))));
     }
 
     @Override
