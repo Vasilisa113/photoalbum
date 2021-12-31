@@ -13,7 +13,5 @@ public class Main {
         PhotoalbumComponent photoalbumComponent = DaggerPhotoalbumComponent.builder().build();
         Photoalbum photoalbum = photoalbumComponent.photoalbum();
         photoalbum.start();
-        //Vertx vertx = Vertx.vertx();
-        //vertx.deployVerticle(new CheckingVerticle());
     }
 }

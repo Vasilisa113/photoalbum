@@ -49,7 +49,12 @@ public class MeshStorage implements TemplateStorage, Database {
         builder.setSsl(config.getMeshStorage().isSsl());
         client = new MeshRestOkHttpClientImpl(builder.build());
         //client.setLogin("admin", "admin");
-        client.setAPIKey(config.getMeshStorage().getApiKey());
+       if (config.getMeshStorage().getApiKey()!= null){
+           client.setAPIKey(config.getMeshStorage().getApiKey());
+       }
+       else{
+           client.setLogin(config.getMeshStorage().getLogin(), config.getMeshStorage().getPassword()).login().blockingGet();
+       }
         //GenericMessageResponse response = client.login().blockingGet();
         //UserResponse response = client.me().blockingGet();
         //System.out.println(response.toString());
