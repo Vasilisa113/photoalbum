@@ -4,6 +4,7 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -13,25 +14,25 @@ import java.io.InputStream;
 
 public class RequestHandlerTest {
     private static RequestHandler requestHandler;
-    private static RoutingContext routingContext;
+    private static InputStream resourceStream;
     @BeforeClass
     public static void setUp (){
         Database database = Mockito.mock(Database.class);
         TemplateHandler templateHandler = Mockito.mock(TemplateHandler.class);
-        InputStream resourceStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("testPic.jpg");
-        Mockito.when(templateHandler.getStaticResource(Mockito.anyString(), Mockito.anyString()))
+        resourceStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("testPic.jpg");
+        Mockito.when(templateHandler.getStaticResource("testResource", "en"))
                 .thenReturn(resourceStream);
-        routingContext = Mockito.mock(RoutingContext.class);
-        HttpServerResponse response = Mockito.mock(HttpServerResponse.class);
-        Mockito.when(routingContext.response()).thenReturn(response);
-        Mockito.when(routingContext.vertx()).thenReturn(Vertx.vertx());
         requestHandler = new RequestHandlerImpl(database, templateHandler);
     }
     @Test
     public void staticCall(){
-        MultiMap queryParams = MultiMap.caseInsensitiveMultiMap().add("lang", "en");
-        Mockito.when(routingContext.queryParams()).thenReturn(queryParams);
-        Mockito.when(routingContext.pathParam(Mockito.anyString())).thenReturn("/");
-        requestHandler.handleStaticResource(routingContext);
+        InputStream testResource = requestHandler.handleStaticResource("testResource", "en");
+        Assert.assertNotNull("The resource should exist", testResource);
+        Assert.assertEquals("Unexpected resource", testResource, resourceStream);
+    }
+    @Test
+    public void inexistingStaticCall (){
+        InputStream testResource = requestHandler.handleStaticResource("dsghjf", "en");
+        Assert.assertNull("The resource should not exist", testResource);
     }
 }

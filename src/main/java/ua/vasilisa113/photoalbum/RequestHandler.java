@@ -1,15 +1,15 @@
 package ua.vasilisa113.photoalbum;
 
-import io.vertx.ext.web.RoutingContext;
+import io.reactivex.Single;
 
-import java.io.IOException;
+import java.io.InputStream;
 
 public interface RequestHandler {
-    public void handlePortfolio(RoutingContext context);
-    public void handleAlbum(RoutingContext context);
-    public void handlePrice(RoutingContext context);
-    public void handleBlog(RoutingContext context);
-    public void handleContacts(RoutingContext context);
+    public Single<String> handlePortfolio();
+    public void handleAlbum();
+    public void handlePrice();
+    public void handleBlog();
+    public void handleContacts();
 
-    public void handleStaticResource(RoutingContext context);
+    public InputStream handleStaticResource(String path, String lang);
 }
