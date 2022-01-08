@@ -10,25 +10,27 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import ua.vasilisa113.photoalbum.impl.RequestHandlerImpl;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 public class RequestHandlerTest {
     private static RequestHandler requestHandler;
-    private static InputStream resourceStream;
+    private static TemplateHandler templateHandler;
     @BeforeClass
     public static void setUp (){
         Database database = Mockito.mock(Database.class);
-        TemplateHandler templateHandler = Mockito.mock(TemplateHandler.class);
-        resourceStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("testPic.jpg");
-        Mockito.when(templateHandler.getStaticResource("testResource", "en"))
-                .thenReturn(resourceStream);
+        templateHandler = Mockito.mock(TemplateHandler.class);
         requestHandler = new RequestHandlerImpl(database, templateHandler);
     }
     @Test
-    public void staticCall(){
-        InputStream testResource = requestHandler.handleStaticResource("testResource", "en");
-        Assert.assertNotNull("The resource should exist", testResource);
-        Assert.assertEquals("Unexpected resource", testResource, resourceStream);
+    public void staticCall() throws IOException {
+        try (InputStream resourceStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("testPic.jpg")) {
+            Mockito.when(templateHandler.getStaticResource("testResource", "en"))
+                    .thenReturn(resourceStream);
+            InputStream testResource = requestHandler.handleStaticResource("testResource", "en");
+            Assert.assertNotNull("The resource should exist", testResource);
+            Assert.assertEquals("Unexpected resource", testResource, resourceStream);
+        }
     }
     @Test
     public void inexistingStaticCall (){
